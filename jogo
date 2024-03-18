@@ -3,7 +3,7 @@ import sys
 import random
 
 def palavraAleatoria():
-    palavras = ['BANANA', 'LARANJA']
+    palavras = ['BANANA', 'LARANJA', 'GOIABA', 'ACEROLA', 'LIMAO', 'ABACATE']
     palavra = random.choice(palavras)
     return palavra
 
