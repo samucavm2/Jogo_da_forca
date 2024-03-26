@@ -12,20 +12,17 @@ def palavraAleatoria():
 class Inicio:
     def __init__(self, largura=1152, altura=648):
         pygame.init()
-        fonte = pygame.font.SysFont(None, 48)
         pygame.display.set_caption("Jogo da Forca")
         
-        #Atributos
         self.largura = largura
         self.altura = altura
         self.tela = pygame.display.set_mode((self.largura, self.altura))
-        self.imagem_fundo = pygame.image.load(r"C:\Users\samue\Pictures\jogo_da_forca\desenho_base.png")
-        self.imagem_fundo = pygame.transform.scale(self.imagem_fundo, (self.largura, self.altura))
         self.cor_texto = (255, 255, 255)
         
         
     def draw_hangman(self, tentativas):
         partes_corpo = [
+            r"C:\Users\samue\Pictures\jogo_da_forca\desenho_base.png",
             r"C:\Users\samue\Pictures\jogo_da_forca\cabeca.png",
             r"C:\Users\samue\Pictures\jogo_da_forca\peito.png",
             r"C:\Users\samue\Pictures\jogo_da_forca\braco_esquerdo.png",
@@ -34,7 +31,7 @@ class Inicio:
             r"C:\Users\samue\Pictures\jogo_da_forca\morreu.png"
         ]
 
-        for i in range(6 - tentativas):
+        for i in range(7 - tentativas):
             imagem = pygame.image.load(partes_corpo[i])
             self.tela.blit(pygame.transform.scale(imagem, (self.largura, self.altura)), (0, 0))
             
@@ -80,10 +77,6 @@ class Inicio:
             tentativas = 6
             new = False
            
-            self.imagem_fundo = pygame.image.load(r"C:\Users\samue\Pictures\jogo_da_forca\desenho_base.png")
-            self.imagem_fundo = pygame.transform.scale(self.imagem_fundo, (self.largura, self.altura))
-            self.tela.blit(self.imagem_fundo, (0, 0))
-                           
             while True:
                 self.draw_hangman(tentativas)
                 fim = self.check_game_over(letras_certas, letras_erradas, palavra, tentativas, fonte_fim, fonte)
@@ -122,7 +115,7 @@ class Inicio:
         pygame.quit()
         sys.exit()
 
-        
+    
 if __name__ == "__main__":
     jogo = Inicio()
     jogo.run()
