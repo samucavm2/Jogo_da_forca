@@ -2,120 +2,129 @@ import pygame
 import sys
 import random
 
+
 def palavraAleatoria():
-    palavras = ['BANANA', 'LARANJA', 'GOIABA', 'ACEROLA', 'LIMAO', 'ABACATE']
+    palavras = ['BANANA', 'LARANJA', 'GOIABA', 'MACA', 'ABACATE', 'MELANCIA']
     palavra = random.choice(palavras)
     return palavra
+    
 
-def game():
-    pygame.init()
-    jogar = True
-    while jogar:
-        #Tela inicial
-        largura, altura = [1152, 648]
-        tela = pygame.display.set_mode((largura, altura))
+class Inicio:
+    def __init__(self, largura=1152, altura=648):
+        pygame.init()
+        fonte = pygame.font.SysFont(None, 48)
         pygame.display.set_caption("Jogo da Forca")
-        imagem_fundo = pygame.image.load(r"C:\Users\samue\Pictures\jogo_da_forca\desenho_base.png")
-        imagem_fundo = pygame.transform.scale(imagem_fundo, (largura, altura))
+        
+        #Atributos
+        self.largura = largura
+        self.altura = altura
+        self.tela = pygame.display.set_mode((self.largura, self.altura))
+        self.imagem_fundo = pygame.image.load(r"C:\Users\samue\Pictures\jogo_da_forca\desenho_base.png")
+        self.imagem_fundo = pygame.transform.scale(self.imagem_fundo, (self.largura, self.altura))
+        self.texto_vitoria = fonte.render("Você venceu!", True, (0, 0, 0))
+        self.posicao_texto = self.texto_vitoria.get_rect(center=(self.largura/2, self.altura/2))
+        self.cor_texto = (255, 255, 255)
+        
+        
+    def draw_hangman(self, tentativas):
+        partes_corpo = [
+            r"C:\Users\samue\Pictures\jogo_da_forca\cabeca.png",
+            r"C:\Users\samue\Pictures\jogo_da_forca\peito.png",
+            r"C:\Users\samue\Pictures\jogo_da_forca\braco_esquerdo.png",
+            r"C:\Users\samue\Pictures\jogo_da_forca\braco_direito.png",
+            r"C:\Users\samue\Pictures\jogo_da_forca\perna_esquerda.png",
+            r"C:\Users\samue\Pictures\jogo_da_forca\morreu.png"
+        ]
 
-        #Texto da tela
-        cor_linha = (255, 255, 255)
-        cor_texto = (255, 255, 255)
+        for i in range(6 - tentativas):
+            imagem = pygame.image.load(partes_corpo[i])
+            self.tela.blit(pygame.transform.scale(imagem, (self.largura, self.altura)), (0, 0))
+            
+            
+    def draw_game_screen(self, letras_certas, letras_erradas, palavra, tentativas, fonte):
+        self.tela.blit(fonte.render('Tentativas restantes: ' + str(tentativas), True, self.cor_texto), (500, 500))
+        self.tela.blit(fonte.render('Letras erradas: ' + ' '.join(letras_erradas), True, self.cor_texto), (500, 600))
+        self.tela.blit(fonte.render(' '.join(letra if letra in letras_certas else '_' for letra in palavra), True, self.cor_texto), (500, 550))
+    
+    
+    def check_game_over(self, letras_certas, letras_erradas, palavra, tentativas, fonte_fim, fonte):
+        fim = False
+        if all(letra in letras_certas for letra in palavra):
+            self.imagem_fundo = pygame.image.load(r"C:\Users\samue\Pictures\jogo_da_forca\vitoria.png")
+            self.imagem_fundo = pygame.transform.scale(self.imagem_fundo, (self.largura, self.altura))
+            self.tela.blit(self.imagem_fundo, (0, 0))
+            self.tela.blit(fonte_fim.render("Você venceu!", True, self.cor_texto), (660, 300))
+            fim = True
+
+        if tentativas == 0:
+            self.tela.blit(fonte_fim.render("Você perdeu!", True, self.cor_texto), (660, 300))
+            fim = True
+            
+        if fim:
+                color = (0, 0, 255, 0)
+                pygame.draw.rect(self.tela, color, (700, 350, 120, 30))
+                self.tela.blit(fonte.render("Restart", True, self.cor_texto), (700, 350))
+                pygame.draw.rect(self.tela, color, (900, 350, 70, 30))
+                self.tela.blit(fonte.render("Exit", True, self.cor_texto), (900, 350))
+        
+        return fim
+        
+        
+    def run(self):
+        jogar = True
         fonte = pygame.font.SysFont(None, 48)
         fonte_fim = pygame.font.SysFont(None, 72)
-
-        # Palavra a ser adivinhada
-        palavra = palavraAleatoria()
-
-        letras_certas = set()
-        letras_erradas = []
-        tentativas = 6
-
-        new = False
-
-        while True:
-            tela.blit(imagem_fundo, (0, 0))
-            tela.blit(fonte.render('Tentativas restantes: ' + str(tentativas), True, cor_texto), (500, 500))
-            tela.blit(fonte.render('Letras erradas: ' + ' '.join(letras_erradas), True, cor_texto), (500, 600))
-            tela.blit(fonte.render(' '.join(letra if letra in letras_certas else '_' for letra in palavra), True, cor_texto), (500, 550 ))
-
-            # Desenho do enforcado
-            if tentativas < 6:
-                imagem_fundo = pygame.image.load(r"C:\Users\samue\Pictures\jogo_da_forca\cabeca.png")
-                imagem_fundo = pygame.transform.scale(imagem_fundo, (largura, altura))
-            if tentativas < 5:
-                imagem_fundo = pygame.image.load(r"C:\Users\samue\Pictures\jogo_da_forca\peito.png")
-                imagem_fundo = pygame.transform.scale(imagem_fundo, (largura, altura))
-            if tentativas < 4:
-                imagem_fundo = pygame.image.load(r"C:\Users\samue\Pictures\jogo_da_forca\braco_esquerdo.png")
-                imagem_fundo = pygame.transform.scale(imagem_fundo, (largura, altura))        
-            if tentativas < 3:
-                imagem_fundo = pygame.image.load(r"C:\Users\samue\Pictures\jogo_da_forca\braco_direito.png")  # Substitua "sua_imagem.jpg" pelo caminho da sua imagem
-                imagem_fundo = pygame.transform.scale(imagem_fundo, (largura, altura))        
-            if tentativas < 2:
-                imagem_fundo = pygame.image.load(r"C:\Users\samue\Pictures\jogo_da_forca\perna_esquerda.png")  # Substitua "sua_imagem.jpg" pelo caminho da sua imagem
-                imagem_fundo = pygame.transform.scale(imagem_fundo, (largura, altura))
-            if tentativas < 1:
-                imagem_fundo = pygame.image.load(r"C:\Users\samue\Pictures\jogo_da_forca\morreu.png")  # Substitua "sua_imagem.jpg" pelo caminho da sua imagem
-                imagem_fundo = pygame.transform.scale(imagem_fundo, (largura, altura))
-
-            # Verifica se o jogador ganhou
-            fim = False
-            if all(letra in letras_certas for letra in palavra):
-                imagem_fundo = pygame.image.load(r"C:\Users\samue\Pictures\jogo_da_forca\vitoria.png")  # Substitua "sua_imagem.jpg" pelo caminho da sua imagem
-                imagem_fundo = pygame.transform.scale(imagem_fundo, (largura, altura))
-                tela.blit(fonte_fim.render("Você venceu!", True, cor_texto), (660, 300))
-                color = (0, 0, 255, 0)
-                pygame.draw.rect(tela, color, (700, 350, 120, 30))
-                tela.blit(fonte.render("Restart", True, cor_texto), (700, 350))
-                pygame.draw.rect(tela, color, (900, 350, 70, 30))
-                tela.blit(fonte.render("Exit", True, cor_texto), (900, 350))
-                fim = True
-
-            # Verifica se o jogador perdeu
-            if tentativas == 0:
-                tela.blit(fonte_fim.render("Você perdeu!", True, cor_texto), (660, 300))
-                color = (0, 0, 255, 0)
-                pygame.draw.rect(tela, color, (700, 350, 120, 30))
-                tela.blit(fonte.render("Restart", True, cor_texto), (700, 350))
-                pygame.draw.rect(tela, color, (900, 350, 70, 30))
-                tela.blit(fonte.render("Exit", True, cor_texto), (900, 350))
-                fim = True
-
-            # Eventos do jogo
-            for evento in pygame.event.get():
-                if evento.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                elif evento.type == pygame.KEYDOWN:
-                    if evento.key >= pygame.K_a and evento.key <= pygame.K_z:
-                        letra = chr(evento.key).upper()
-                        if letra not in letras_certas:
-                            letras_certas.add(letra)
-                            if letra not in palavra:
-                                letras_erradas.append(letra)
-                                tentativas -= 1
-                mouse_pressed = pygame.mouse.get_pressed()
-                if mouse_pressed[0]:
-                    # Obtém as coordenadas do mouse
-                    x, y = pygame.mouse.get_pos()
-                    # Faz algo com as coordenadas do mouse (por exemplo, imprime-as na tela)
-                    print(f"Clique do mouse em ({x}, {y})")
+        
+        while jogar:
+            palavra = palavraAleatoria()
+            letras_certas = set()
+            letras_erradas = []
+            tentativas = 6
+            new = False
+           
+            self.imagem_fundo = pygame.image.load(r"C:\Users\samue\Pictures\jogo_da_forca\desenho_base.png")
+            self.imagem_fundo = pygame.transform.scale(self.imagem_fundo, (self.largura, self.altura))
+            self.tela.blit(self.imagem_fundo, (0, 0))
+                           
+            while True:
+                self.draw_hangman(tentativas)
+                fim = self.check_game_over(letras_certas, letras_erradas, palavra, tentativas, fonte_fim, fonte)
+                self.draw_game_screen(letras_certas, letras_erradas, palavra, tentativas, fonte)
+                       
+                # Eventos do jogo
+                for evento in pygame.event.get():
+                    if evento.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+                    elif evento.type == pygame.KEYDOWN:
+                        if evento.key >= pygame.K_a and evento.key <= pygame.K_z:
+                            letra = chr(evento.key).upper()
+                            if letra not in letras_certas and not fim:
+                                letras_certas.add(letra)
+                                if letra not in palavra:
+                                    letras_erradas.append(letra)
+                                    tentativas -= 1
+                                    
+                    mouse_pressed = pygame.mouse.get_pressed()
                     if fim:
-                        if x >= 700 and x <= 820 and y >= 350 and y <= 380:
-                            new = True
-                        if x >= 900 and x <= 1020 and y >= 350 and y <= 380:
-                            jogar = False
+                        if mouse_pressed[0]:
+                            x, y = pygame.mouse.get_pos()                       
+                            if x >= 700 and x <= 820 and y >= 350 and y <= 380:
+                                new = True
+                            if x >= 900 and x <= 1020 and y >= 350 and y <= 380:
+                                jogar = False
 
-            if jogar == False:
-                break
-            if new == True:
-                jogar = True
-                break
-            # Atualização da tela
-            pygame.display.flip()
-    pygame.quit()
-    sys.exit()
+                if jogar == False:
+                    break
+                if new == True:
+                    jogar = True
+                    break
+                    
+                pygame.display.flip()
+        pygame.quit()
+        sys.exit()
 
+        
 if __name__ == "__main__":
-    game()
+    jogo = Inicio()
+    jogo.run()
