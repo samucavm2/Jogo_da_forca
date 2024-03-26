@@ -4,7 +4,7 @@ import random
 
 
 def palavraAleatoria():
-    palavras = ['BANANA', 'LARANJA', 'GOIABA', 'MACA', 'ABACATE', 'MELANCIA']
+    palavras = ['BANANA', 'LARANJA', 'GOIABA', 'MACA', 'ABACATE', 'MELANCIA', 'ACEROLA', 'LIMAO']
     palavra = random.choice(palavras)
     return palavra
     
@@ -21,8 +21,6 @@ class Inicio:
         self.tela = pygame.display.set_mode((self.largura, self.altura))
         self.imagem_fundo = pygame.image.load(r"C:\Users\samue\Pictures\jogo_da_forca\desenho_base.png")
         self.imagem_fundo = pygame.transform.scale(self.imagem_fundo, (self.largura, self.altura))
-        self.texto_vitoria = fonte.render("Você venceu!", True, (0, 0, 0))
-        self.posicao_texto = self.texto_vitoria.get_rect(center=(self.largura/2, self.altura/2))
         self.cor_texto = (255, 255, 255)
         
         
